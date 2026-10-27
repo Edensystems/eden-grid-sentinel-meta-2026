@@ -1,0 +1,46 @@
+# Python virtual envs
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Node
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs / outputs / big data
+*.log
+logs/
+tmp/
+outputs/
+data/
+datasets/
+
+# Firebase
+functions/.firebase/
+functions/node_modules/
+
+# Secrets - never upload
+cred.json
+*service-account*.json
+.env
+.env.*
+functions/.env
