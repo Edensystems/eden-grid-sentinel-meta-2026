@@ -4,7 +4,7 @@ This is the preserved M0 verification snapshot. The owner subsequently requested
 patch application as a draft on 2026-10-30. Current M1 runtime and verification are
 recorded in `M1_REPORT.md`; this request does not establish formal M0 acceptance.
 
-Status: **PARTIAL — LOCAL REMEDIATION VERIFIED; GITHUB PUBLICATION BLOCKED**. M1 is not authorized.
+Status: **M0 OWNER GATES OPEN — LOCAL REMEDIATION VERIFIED AND CARRIED INTO THE M1 DRAFT**. Formal M0 acceptance remains pending.
 
 ## Repository and scope (2026-10-30)
 
@@ -54,7 +54,13 @@ Verified in the isolated remediation worktree on 2026-10-30 with all `pipeline,d
 
 The local remediation commit exists on `m0-remediation`. Pushing to origin failed with HTTP 403: local Git authenticates as `bridzer`, which cannot push to this repository. The GitHub connector independently rejected remote branch creation with HTTP 403, **Resource not accessible by integration**. Neither main nor existing Git history was rewritten.
 
-**PR URL: unavailable — no PR was created. CI outcome: unverified — remediation was not published.** Restore repository write access, push `m0-remediation`, open a PR against `main`, and verify both Python matrix jobs and `sentinel-container`. The workflow is authored but is not evidence of a green GitHub run. Existing `main` CI was not verified in this session.
+At the original M0 handoff no PR existed and CI was unverified. This publication blocker
+was subsequently resolved for the M1 integration using authenticated local Git and the
+GitHub REST API: draft PR https://github.com/Edensystems/eden-grid-sentinel-meta-2026/pull/1
+includes the actual M0 fixes. Implementation CI
+https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/40961682278
+passes both Python jobs and `sentinel-container`. See `M1_REPORT.md` for current evidence.
+The separate `m0-remediation` branch was not published; existing `main` CI was not verified.
 
 Reproduce from a clean checkout without `.env`, ADC or credentials:
 
