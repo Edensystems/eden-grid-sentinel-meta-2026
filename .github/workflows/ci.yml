@@ -22,3 +22,21 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e ".[pipeline,dev]"
       - run: python -m pytest -q
+
+  sentinel-container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f Dockerfile.sentinel -t sentinel-m0 .
+      - name: Verify isolated Sentinel health endpoint
+        shell: bash
+        run: |
+          docker run -d --name sentinel-m0 --network none sentinel-m0
+          trap 'docker logs sentinel-m0; docker rm -f sentinel-m0' EXIT
+          for attempt in {1..30}; do
+            if docker exec sentinel-m0 python -c 'import json, urllib.request; data = json.load(urllib.request.urlopen("http://127.0.0.1:8080/health", timeout=2)); assert data == {"status": "ok", "service": "eden-grid-sentinel", "phase": "M0", "data_mode": "simulation"}'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1

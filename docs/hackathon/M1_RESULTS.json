@@ -1,0 +1,50 @@
+{
+  "cloudy_school_day": {
+    "generated_solar_kwh": 7.8999999999999995,
+    "essential_demand_kwh": 8.4,
+    "flexible_demand_kwh": 4.1,
+    "served_essential_kwh": 6.0,
+    "served_flexible_kwh": 3.2132,
+    "unserved_essential_kwh": 2.4,
+    "unserved_flexible_kwh": 0.8867999999999999,
+    "charged_input_kwh": 1.7,
+    "discharged_output_kwh": 3.0132,
+    "battery_conversion_loss_kwh": 0.43680000000000024,
+    "curtailed_solar_kwh": 0.0,
+    "reserve_violations": 0,
+    "max_abs_balance_residual_kwh": 1.1102230246251565e-16,
+    "final_soc_fraction": 0.2
+  },
+  "night_reserve": {
+    "generated_solar_kwh": 0.0,
+    "essential_demand_kwh": 4.8,
+    "flexible_demand_kwh": 2.0,
+    "served_essential_kwh": 0.72,
+    "served_flexible_kwh": 0.0,
+    "unserved_essential_kwh": 4.08,
+    "unserved_flexible_kwh": 2.0,
+    "charged_input_kwh": 0.0,
+    "discharged_output_kwh": 0.72,
+    "battery_conversion_loss_kwh": 0.08000000000000003,
+    "curtailed_solar_kwh": 0.0,
+    "reserve_violations": 0,
+    "max_abs_balance_residual_kwh": 0.0,
+    "final_soc_fraction": 0.2
+  },
+  "sunny_surplus": {
+    "generated_solar_kwh": 12.0,
+    "essential_demand_kwh": 4.0,
+    "flexible_demand_kwh": 2.0,
+    "served_essential_kwh": 4.0,
+    "served_flexible_kwh": 2.0,
+    "unserved_essential_kwh": 0.0,
+    "unserved_flexible_kwh": 0.0,
+    "charged_input_kwh": 2.1052631578947363,
+    "discharged_output_kwh": 0.0,
+    "battery_conversion_loss_kwh": 0.10526315789473692,
+    "curtailed_solar_kwh": 3.8947368421052637,
+    "reserve_violations": 0,
+    "max_abs_balance_residual_kwh": 0.0,
+    "final_soc_fraction": 1.0
+  }
+}

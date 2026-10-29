@@ -3,13 +3,22 @@
 Units: power in kW, energy in kWh, battery SOC as a fraction in [0,1].
 Timestamp fields require timezone-aware ISO 8601 datetimes.
 """
-from datetime import datetime
+from datetime import timezone
 from typing import Literal
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class StrictSchema(BaseModel):
-    model_config = ConfigDict(extra="forbid", validate_assignment=True)
+    model_config = ConfigDict(
+        extra="forbid", validate_assignment=True,
+        str_strip_whitespace=True, allow_inf_nan=False,
+    )
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def strip_strings(cls, value):
+        # ConfigDict strips str fields; Literal[str] also needs normalization.
+        return value.strip() if isinstance(value, str) else value
 
 
 class HealthResponse(StrictSchema):
@@ -47,6 +56,15 @@ class ForecastEvent(StrictSchema):
     source: Literal["simulated", "measured", "modeled"]
     points: list[ForecastPoint] = Field(min_length=1)
 
+    @model_validator(mode="after")
+    def require_increasing_timestamps(self):
+        if any(
+            a.timestamp.astimezone(timezone.utc) >= b.timestamp.astimezone(timezone.utc)
+            for a, b in zip(self.points, self.points[1:])
+        ):
+            raise ValueError("forecast timestamps must be strictly increasing")
+        return self
+
 
 class RecommendationEvent(StrictSchema):
     schema_version: Literal["1.0"] = "1.0"
@@ -57,6 +75,12 @@ class RecommendationEvent(StrictSchema):
     shift_energy_kwh: float = Field(ge=0)
     reason: str = Field(min_length=1)
     approval_required: Literal[True] = True
+
+    @model_validator(mode="after")
+    def require_zero_energy_for_no_action(self):
+        if self.action == "no_action" and self.shift_energy_kwh != 0:
+            raise ValueError("no_action requires zero shift_energy_kwh")
+        return self
 
 
 class ApprovalEvent(StrictSchema):
