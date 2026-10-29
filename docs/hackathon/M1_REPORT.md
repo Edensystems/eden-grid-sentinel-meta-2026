@@ -1,11 +1,12 @@
 # M1 verification report
 
-**Status: LOCALLY VERIFIED; PUBLICATION PENDING; NOT MERGED OR OWNER-ACCEPTED.**
+**Status: LOCALLY VERIFIED AND PUBLISHED AS A DRAFT; IMPLEMENTATION CI GREEN; NOT MERGED OR OWNER-ACCEPTED.**
 
 ## Scope and provenance
 
 - Repository: https://github.com/Edensystems/eden-grid-sentinel-meta-2026
 - Feature branch: `feat/m1-microgrid-digital-twin`, already based on local and remote `main` at `4422e9d1c16e6c7e4e5903efc5e1861659f4cc08` when this task started. The initial root commit remains `f3ea5dc1b6f95db98069a7c96003b00bac9c2594`. No Git history was rewritten.
+- Implementation commit: `c3803cc284ac87c1d3f818f0c5d8f34a3bbb0417` (`feat(m1): add deterministic solar microgrid simulator`). A documentation-only follow-up records publication evidence.
 - The owner explicitly requested applying this M1 patch on 2026-10-30. That authorizes draft implementation, not formal M0 acceptance, merge or M2.
 - The supplied patch files were already present and matched the Downloads copy. Reconciled the patch with M0 remediation `3288389ee67e14dd6aeadac7e915c2a783ba309d`, carrying the actual hardened contracts, offline guard, dedicated Dockerfile and verified documentation into this branch. The worktree gitlink on main had not applied those changes to main's source files.
 - New M1 code: `src/eden/sentinel/twin.py` and `scenarios.py`; API adds fixture listing, fixture simulation and bounded custom simulation. `/health` retains its M0 compatibility response. All new runtime code stays in `eden.sentinel`; inherited EDEN services, integrations, agents, Dockerfile and Firebase configuration are unchanged.
@@ -40,9 +41,11 @@ Tests independently verify battery storage accounting, bus accounting, reserve, 
 
 - Static AST review of `api.py`, `twin.py` and `scenarios.py`: imports are limited to datetime/typing, Pydantic/FastAPI and Sentinel modules; no direct file, process, cloud, model or hardware I/O calls were found. Offline guarded tests exercise all simulation routes. This is source/test evidence, not a universal security certification.
 - Changed-file secret-pattern scan passed before commit. The populated model-key field inherited in `.env.example` was cleared. A credential-like value remains in earlier Git history; the owner should rotate/revoke it if real. No history rewrite or credential use was performed.
-- Remote main SHA was checked. Connector branch creation still returns **HTTP 403 Resource not accessible by integration**. Local Git publication and draft PR outcome will be recorded after the requested attempt.
-- Docker is unavailable locally. Container CI is authored, not locally executed.
-- GitHub Actions URL/outcome: **pending publication**. PR URL: **pending publication**.
+- Remote main SHA was checked. Connector branch/PR creation still returned **HTTP 403 Resource not accessible by integration**. The existing authenticated local Git session successfully pushed the feature branch; GitHub REST API using that session created draft PR #1. No tokens were printed or stored in project files.
+- Draft PR: https://github.com/Edensystems/eden-grid-sentinel-meta-2026/pull/1 — draft, not merged.
+- Implementation push CI: https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/40961682278 — **SUCCESS**. Explicitly verified `test (3.11)`, `test (3.12)` and `sentinel-container`, including dependency installation, pytest, image build and isolated HTTP health check.
+- PR-triggered implementation CI: https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/40961882773 — **SUCCESS**. The documentation-only follow-up will trigger new checks.
+- Docker is unavailable locally; the container was built and exercised on the GitHub runner, not deployed to cloud infrastructure.
 
 ## Earlier archive evidence (not current workstation results)
 
@@ -52,8 +55,8 @@ The supplied patch reported Python 3.13.5, pytest 9.0.2, FastAPI 0.128.2 and Pyd
 
 - [x] Apply/reconcile M1 patch on the existing feature branch without rewriting history.
 - [x] Complete supported Python 3.11/3.12 suites, real HTTP checks and deterministic fixture verification.
-- [ ] Publish branch and open draft PR with exact URL.
-- [ ] Verify GitHub Actions Python 3.11/3.12 and container jobs.
+- [x] Publish branch and open draft PR with exact URL.
+- [x] Verify implementation GitHub Actions Python 3.11/3.12 and container jobs.
 - [ ] Review official competition rules and pre-existing EDEN eligibility with evidence.
 - [ ] Owner accepts M0/M1 evidence and explicitly approves merge.
 

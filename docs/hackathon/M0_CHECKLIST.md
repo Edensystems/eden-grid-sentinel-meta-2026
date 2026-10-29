@@ -9,7 +9,7 @@
 - [x] Inherited Firebase/production boundary documented; Python suite blocks external connections.
 - [x] Complete Python 3.11 and 3.12 suites pass in the remediation worktree (61 each).
 - [x] Current local running HTTP `/health` response verified on both interpreters (HTTP 200).
-- [ ] Remediation pull request created and GitHub Actions passes both Python jobs and container check.
+- [x] Remediation carried into M1 draft PR #1; implementation CI passes both Python jobs and container check (links in `M1_REPORT.md`).
 - [ ] Official event rules and pre-existing-code eligibility reviewed with evidence.
 - [x] Owner explicitly requested M1 patch application as a draft on 2026-10-30.
 - [ ] Formal M0 acceptance, eligibility evidence and approval to merge M1 recorded.

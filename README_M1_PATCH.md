@@ -6,7 +6,10 @@ describe the original archive. Do not recopy its older M0 schema/report over the
 verified integration. See `docs/hackathon/M1_REPORT.md` for current supported-Python
 results, publication status and owner gates; `M1_RESULTS.json` contains exact synthetic summaries.
 
-Use this archive against the original public repo at https://github.com/Edensystems/eden-grid-sentinel-meta-2026. It includes **only changed/new files**, not the entire original repository. It has not been pushed to GitHub because the integration returned HTTP 403 on branch creation.
+The original archive targeted https://github.com/Edensystems/eden-grid-sentinel-meta-2026
+and included **only changed/new files**, not the entire repository. Although the connector
+still returned HTTP 403, the reconciled integration was pushed using local Git and opened
+as draft PR https://github.com/Edensystems/eden-grid-sentinel-meta-2026/pull/1.
 
 ## Apply
 
