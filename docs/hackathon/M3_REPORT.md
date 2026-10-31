@@ -54,3 +54,10 @@ No Meta API calls, trained ML/AI forecasts, external weather information, measur
 - [ ] Obtain explicit owner sign-off before merging or starting M4.
 
 Do not change this report to `COMPLETE` based on these staged checks alone.
+
+
+## Integration addendum (2026-10-31, branch `integration/m2-m4`)
+
+- M3 code was first published as `c52dbe6` on `feat/m1-microgrid-digital-twin` (PR #1, titled M1); `feat/m3-forecast-scheduler` still points at M1 commit `aa3cf08` and contains no M3 code.
+- An independent audit reproduced every figure in `M3_RESULTS.json` exactly from the raw fixtures, and confirmed energy balance, SOC/power limits, essential priority, flexible-energy conservation, determinism and no forecast leakage (`docs/ai/audits/m2-m4/TEST_EVIDENCE.md`).
+- The local-search scheduler remains a heuristic with a 24-interval horizon; no global optimality is claimed.

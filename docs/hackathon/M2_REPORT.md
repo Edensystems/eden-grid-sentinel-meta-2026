@@ -42,3 +42,11 @@ See current turn's reported test output. `python -m pytest` on the supplied M1 p
 | Owner approval of M2 | Not granted | |
 
 Do not claim a live working Muse Spark integration or completed milestone until the live smoke and gates are evidenced.
+
+
+## Integration addendum (2026-10-31, branch `integration/m2-m4`)
+
+- M2 (`191bbed`) was copied, not merged, into `c52dbe6`; that copy lost `test_m2_safeguards.py`, the `meta` extra and the CI `meta` install. Merge `8262ccb` restores them.
+- New allowlisted read-only tool `get_m3_evaluation` / `assess_m3_scenario()`; its output can be attached to M4 proposals as advisory only.
+- Verified on Python 3.11.18 and 3.12.10: 192 passed, 0 skipped (full suite). The staged 57-pass figure above is historical.
+- Live Muse Spark request: still NOT run. A non-empty `MODEL_API_KEY` was committed in `.env.example` at `4422e9d` and `c52dbe6`; the owner reports both keys revoked on 2026-10-31 (not provider-verified by the auditor). See `M45_REMEDIATION_REPORT.md`.

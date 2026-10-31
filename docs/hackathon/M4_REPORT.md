@@ -47,3 +47,10 @@ See `M4_RESULTS.json` for precise reproducible values. For `critical_priority_sc
 ## Known limitations
 
 Simulated static fixtures only; no production identity provider, persistent audit, signed logs, rate limiting, cloud deployment, multiple worker coordination, trusted sensor inputs, hardware control, real-image SAM segmentation or fault diagnosis. Operator token is a local demonstration mechanism and is not suitable for deployment.
+
+
+## Integration addendum (2026-10-31, branch `integration/m2-m4`)
+
+- The local commit `64ba350` omitted the M4 router registration (5 failing tests); it is not used. `integration/m2-m4` builds on `c52dbe6`, which registers the router; unconfigured `/m4` requests return 503.
+- `LocalApprovalWorkflow.create()` accepts an optional advisory-only Muse attachment; Guardian and human decision remain the only gates.
+- Open gaps confirmed by audit: the approver cannot see plan intervals; denied/failed attempts are not audited; audit tail truncation is undetected; the audit is in memory only. The staged 110-pass figure above is historical.
