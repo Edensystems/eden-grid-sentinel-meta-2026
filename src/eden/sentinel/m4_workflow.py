@@ -10,7 +10,7 @@ from hashlib import sha256
 import hmac
 import json
 from threading import RLock
-from typing import Callable, Literal
+from typing import TYPE_CHECKING, Callable, Literal
 from uuid import uuid4
 
 from pydantic import AwareDatetime, Field
@@ -19,6 +19,11 @@ from eden.sentinel.twin import PowerInterval, SimulationRequest, TwinModel, run_
 from eden.sentinel.m3_demo import available_scenarios, previous_day_fixture, target_fixture
 from eden.sentinel.m3_scheduler import SchedulingPolicy, SchedulingResult, schedule_flexible_load
 from eden.sentinel.m4_guardian import GuardianVerdict, guard_schedule
+
+if TYPE_CHECKING:
+    # Type-only: the M2 safeguard requires that importing the API never loads
+    # the Model API adapter. Advisories are validated field by field in create().
+    from eden.sentinel.muse import M3AdvisoryResult
 
 
 class WorkflowError(Exception):
@@ -47,6 +52,11 @@ class ProposalView(TwinModel):
     guardian: GuardianVerdict
     forecast_shifted_kwh: float
     approved_by: str | None = None
+    # Advisory-only M2 attachment (headline/risk for the human reader). It has
+    # no authority: Guardian + operator decision remain the only gates.
+    advisory_model: str | None = None
+    advisory_risk_level: str | None = None
+    advisory_headline: str | None = None
     realized_essential_unserved_kwh: float | None = None
     realized_flexible_unserved_kwh: float | None = None
     realized_essential_reduction_kwh: float | None = None
@@ -56,9 +66,11 @@ class ProposalView(TwinModel):
 class _Proposal:
     def __init__(self, id: str, scenario: str, planned: SchedulingResult,
                  original: SimulationRequest, policy: SchedulingPolicy,
-                 verdict: GuardianVerdict, expires: datetime):
+                 verdict: GuardianVerdict, expires: datetime,
+                 advisory: M3AdvisoryResult | None = None):
         self.id = id
         self.scenario = scenario
+        self.advisory = advisory.model_copy(deep=True) if advisory else None
         self.plan = planned.model_copy(deep=True)
         self.original = original.model_copy(deep=True)
         self.policy = policy.model_copy(deep=True)
@@ -100,6 +112,9 @@ class LocalApprovalWorkflow:
             expires_at=rec.expires, guardian=rec.verdict.model_copy(deep=True),
             forecast_shifted_kwh=rec.plan.summary.energy_shifted_kwh,
             approved_by=rec.approved_by,
+            advisory_model=rec.advisory.model if rec.advisory else None,
+            advisory_risk_level=rec.advisory.assessment.risk_level if rec.advisory else None,
+            advisory_headline=rec.advisory.assessment.headline if rec.advisory else None,
             realized_essential_unserved_kwh=rec.realized_essential_unserved_kwh,
             realized_flexible_unserved_kwh=rec.realized_flexible_unserved_kwh,
             realized_essential_reduction_kwh=rec.realized_essential_reduction_kwh,
@@ -121,9 +136,19 @@ class LocalApprovalWorkflow:
             raise WorkflowError("operator_identity_required")
         return actor.strip()
 
-    def create(self, scenario: str, *, policy: SchedulingPolicy | None = None) -> ProposalView:
+    def create(self, scenario: str, *, policy: SchedulingPolicy | None = None,
+               advisory: M3AdvisoryResult | None = None) -> ProposalView:
         if scenario not in available_scenarios():
             raise WorkflowError("unknown_scenario")
+        if advisory is not None:
+            # Advisory is untrusted prose attached for the human reader. It must
+            # describe this exact scenario and can never substitute for the
+            # Guardian check below or for a human decision.
+            if (advisory.mode != "simulation" or advisory.kind != "advisory_only"
+                    or advisory.evidence.scenario_name != scenario
+                    or advisory.assessment.scenario_name != scenario
+                    or advisory.assessment.requires_human_approval is not True):
+                raise WorkflowError("advisory_scenario_mismatch")
         p = policy or SchedulingPolicy()
         # Crucial anti-lookahead invariant: planning uses historical solar and a
         # published (synthetic) load timetable, never the actual future solar.
@@ -141,7 +166,7 @@ class LocalApprovalWorkflow:
             raise WorkflowError("guardian_rejected_plan")
         with self.lock:
             rec = _Proposal(str(uuid4()), scenario, plan, original, p, verdict,
-                            self._now() + timedelta(minutes=15))
+                            self._now() + timedelta(minutes=15), advisory=advisory)
             self.records[rec.id] = rec
             self._append(rec, "system", "proposed", "forecast-based schedule proposed; no actuation")
             return self._snapshot(rec)
