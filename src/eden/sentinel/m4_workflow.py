@@ -37,10 +37,20 @@ class AuditEvent(TwinModel):
     proposal_id: str = Field(min_length=1)
     at: AwareDatetime
     actor: str = Field(min_length=1)
-    event: Literal["proposed", "approved", "rejected", "applied", "expired"]
+    event: Literal["proposed", "approved", "rejected", "applied", "expired", "denied"]
     note: str
     previous_hash: str
     hash: str
+
+
+class PlannedInterval(TwinModel):
+    """What the operator is approving, per interval (forecast-time values)."""
+    timestamp: AwareDatetime
+    duration_minutes: int
+    forecast_solar_kw: float
+    essential_demand_kw: float
+    original_flexible_kw: float
+    planned_flexible_kw: float
 
 
 class ProposalView(TwinModel):
@@ -51,6 +61,15 @@ class ProposalView(TwinModel):
     expires_at: AwareDatetime
     guardian: GuardianVerdict
     forecast_shifted_kwh: float
+    # Informed approval: the exact Guardian-checked plan and its forecast trade-off.
+    plan_sha256: str
+    planned_intervals: list[PlannedInterval]
+    forecast_essential_unserved_baseline_kwh: float
+    forecast_essential_unserved_planned_kwh: float
+    forecast_flexible_unserved_baseline_kwh: float
+    forecast_flexible_unserved_planned_kwh: float
+    # Retain this to detect later truncation: verify_audit(events, expected_head=...).
+    audit_head_hash: str
     approved_by: str | None = None
     # Advisory-only M2 attachment (headline/risk for the human reader). It has
     # no authority: Guardian + operator decision remain the only gates.
@@ -61,6 +80,18 @@ class ProposalView(TwinModel):
     realized_flexible_unserved_kwh: float | None = None
     realized_essential_reduction_kwh: float | None = None
     audit: list[AuditEvent]
+
+
+def _plan_digest(plan: SchedulingResult, original: SimulationRequest,
+                 policy: SchedulingPolicy) -> str:
+    """Bind plan, forecast input and policy together. The Guardian re-derives the
+    plan from the stored input, so only this digest detects a coherent edit of all three."""
+    material = {
+        "scheduled_request": plan.scheduled_request.model_dump(mode="json"),
+        "original": original.model_dump(mode="json"),
+        "policy": policy.model_dump(mode="json"),
+    }
+    return sha256(json.dumps(material, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
 class _Proposal:
@@ -75,6 +106,7 @@ class _Proposal:
         self.original = original.model_copy(deep=True)
         self.policy = policy.model_copy(deep=True)
         self.verdict = verdict.model_copy(deep=True)
+        self.plan_digest = _plan_digest(self.plan, self.original, self.policy)
         self.expires = expires
         self.status: str = "pending"
         self.approved_by: str | None = None
@@ -106,11 +138,33 @@ class LocalApprovalWorkflow:
         digest = sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
         rec.audit.append(AuditEvent(**payload, hash=digest))
 
+    def _deny(self, rec: _Proposal, actor: str, code: str) -> WorkflowError:
+        """Record a refused attempt in the hash chain, then return the error to raise."""
+        self._append(rec, actor, "denied", code)
+        return WorkflowError(code)
+
     def _snapshot(self, rec: _Proposal) -> ProposalView:
+        s = rec.plan.summary
+        planned = [
+            PlannedInterval(
+                timestamp=o.timestamp, duration_minutes=o.duration_minutes,
+                forecast_solar_kw=o.solar_generation_kw,
+                essential_demand_kw=o.essential_demand_kw,
+                original_flexible_kw=o.flexible_demand_kw,
+                planned_flexible_kw=p.flexible_demand_kw,
+            )
+            for o, p in zip(rec.original.intervals, rec.plan.scheduled_request.intervals)
+        ]
         return ProposalView(
             proposal_id=rec.id, scenario=rec.scenario, status=rec.status,
             expires_at=rec.expires, guardian=rec.verdict.model_copy(deep=True),
-            forecast_shifted_kwh=rec.plan.summary.energy_shifted_kwh,
+            forecast_shifted_kwh=s.energy_shifted_kwh,
+            plan_sha256=rec.plan_digest, planned_intervals=planned,
+            forecast_essential_unserved_baseline_kwh=s.essential_unserved_baseline_kwh,
+            forecast_essential_unserved_planned_kwh=s.essential_unserved_scheduled_kwh,
+            forecast_flexible_unserved_baseline_kwh=s.flexible_unserved_baseline_kwh,
+            forecast_flexible_unserved_planned_kwh=s.flexible_unserved_scheduled_kwh,
+            audit_head_hash=rec.audit[-1].hash,
             approved_by=rec.approved_by,
             advisory_model=rec.advisory.model if rec.advisory else None,
             advisory_risk_level=rec.advisory.assessment.risk_level if rec.advisory else None,
@@ -168,7 +222,8 @@ class LocalApprovalWorkflow:
             rec = _Proposal(str(uuid4()), scenario, plan, original, p, verdict,
                             self._now() + timedelta(minutes=15), advisory=advisory)
             self.records[rec.id] = rec
-            self._append(rec, "system", "proposed", "forecast-based schedule proposed; no actuation")
+            self._append(rec, "system", "proposed",
+                         f"forecast-based schedule proposed; no actuation; plan_sha256={rec.plan_digest}")
             return self._snapshot(rec)
 
     def inspect(self, proposal_id: str) -> ProposalView:
@@ -183,10 +238,12 @@ class LocalApprovalWorkflow:
         with self.lock:
             rec = self._find(proposal_id)
             if rec.status != "pending":
-                raise WorkflowError("decision_not_allowed_in_state_" + rec.status)
+                raise self._deny(rec, operator, "decision_not_allowed_in_state_" + rec.status)
             # Recheck just before operator decision; never assume earlier guard is durable.
             if not guard_schedule(rec.plan, rec.original, rec.policy).allowed:
-                raise WorkflowError("guardian_rejected_plan")
+                raise self._deny(rec, operator, "guardian_rejected_plan")
+            if not hmac.compare_digest(_plan_digest(rec.plan, rec.original, rec.policy), rec.plan_digest):
+                raise self._deny(rec, operator, "plan_digest_mismatch")
             rec.status = decision
             if decision == "approved":
                 rec.approved_by = operator
@@ -198,11 +255,13 @@ class LocalApprovalWorkflow:
         with self.lock:
             rec = self._find(proposal_id)
             if rec.status != "approved":
-                raise WorkflowError("execution_requires_approval")
+                raise self._deny(rec, operator, "execution_requires_approval")
             if not hmac.compare_digest(operator, rec.approved_by or ""):
-                raise WorkflowError("approval_operator_mismatch")
+                raise self._deny(rec, operator, "approval_operator_mismatch")
             if not guard_schedule(rec.plan, rec.original, rec.policy).allowed:
-                raise WorkflowError("guardian_rejected_plan")
+                raise self._deny(rec, operator, "guardian_rejected_plan")
+            if not hmac.compare_digest(_plan_digest(rec.plan, rec.original, rec.policy), rec.plan_digest):
+                raise self._deny(rec, operator, "plan_digest_mismatch")
             # Apply ONLY to a local M1 synthetic scenario. No physical connections.
             actual = target_fixture(rec.scenario)
             applied_rows: list[PowerInterval] = []
@@ -214,7 +273,7 @@ class LocalApprovalWorkflow:
             baseline = run_simulation(actual)
             realized = run_simulation(scheduled_request)
             if realized.summary.reserve_violations or realized.summary.max_abs_balance_residual_kwh > 1e-8:
-                raise WorkflowError("actual_simulation_safety_failure")
+                raise self._deny(rec, operator, "actual_simulation_safety_failure")
             rec.realized_essential_unserved_kwh = realized.summary.unserved_essential_kwh
             rec.realized_flexible_unserved_kwh = realized.summary.unserved_flexible_kwh
             rec.realized_essential_reduction_kwh = (
@@ -225,7 +284,11 @@ class LocalApprovalWorkflow:
             return self._snapshot(rec)
 
     @staticmethod
-    def verify_audit(events: list[AuditEvent]) -> bool:
+    def verify_audit(events: list[AuditEvent], *, expected_head: str | None = None) -> bool:
+        """Verify chain integrity. Without expected_head, dropping trailing events
+        is undetectable; pass a previously retained audit_head_hash to catch it."""
+        if expected_head is not None and (not events or not hmac.compare_digest(events[-1].hash, expected_head)):
+            return False
         prev = "0" * 64
         for index, item in enumerate(events, 1):
             if item.sequence != index or item.previous_hash != prev:

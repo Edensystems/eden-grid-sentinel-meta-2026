@@ -44,7 +44,8 @@ def local_operator(request: Request, authorization: str | None = Header(default=
 def translate_error(exc: WorkflowError) -> HTTPException:
     if exc.code in ("proposal_not_found", "unknown_scenario"):
         return HTTPException(status_code=404, detail=exc.code)
-    if exc.code in ("guardian_rejected_plan", "actual_simulation_safety_failure"):
+    if exc.code in ("guardian_rejected_plan", "plan_digest_mismatch",
+                    "actual_simulation_safety_failure"):
         return HTTPException(status_code=422, detail=exc.code)
     return HTTPException(status_code=409, detail=exc.code)
 
