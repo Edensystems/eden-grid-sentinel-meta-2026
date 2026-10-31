@@ -1,6 +1,17 @@
 # M2 verification report — prepared implementation
 
-**Status: LOCAL OFFLINE TESTS PERFORMED; GITHUB CI / LIVE API / OWNER GATE PENDING.**
+**Current status: M2 implementation is present on the feature branch; this checkout has only been statically reviewed in this verification pass. Supported-runtime tests, GitHub CI, publication, live API evidence, and owner gates remain pending.**
+
+## Current checkout verification (2026-10-31)
+
+- Local Git state: branch `feat/m2-muse-spark-integration`, HEAD `aa3cf08ffc22471f3407d99f300dcaf70f5ddd64` (the documented M1 base). The M2 changes are present but uncommitted. The status shows changes only to M2 integration files, `pyproject.toml`, and CI; no M1 implementation files are modified.
+- Dependency/CI inspection: `pyproject.toml` declares `meta = ["openai>=2.0,<3"]`; CI installs `.[pipeline,dev,meta]` in its Python 3.11/3.12 matrix.
+- Source-level protocol review: the adapter requests `tool_choice="auto"`, accepts exactly one allowlisted call, validates its JSON and scenario, replays the assistant tool-call message before the tool response, and validates final output with a strict schema. It sets token limits of 768 and 1024, disables SDK retries, and retries transient errors at most once per logical request (four provider attempts maximum).
+- Source-level safety review: M1 computes attached evidence; the public API has no model route; imports do not instantiate the SDK; only the explicit client builder reads `MODEL_API_KEY`; both model requests set `store=False`. The smoke script is offline by default and requires both `--live` and `--confirm-billing` for provider access. These are inspection findings, not executed test results.
+- Automated tests and network-based publication were not run in this pass because the applicable contribution workflow prohibits agent-run test and network operations. Therefore there are no current-checkout Python 3.11/3.12 results, GitHub CI results, pushed branch, or draft PR URL to report. The 57-pass staging result below is historical and does not verify this checkout.
+- No live model call was made. Credential rotation/revocation remains unverified; no credential files or values were accessed.
+
+The implementation must remain an uncommitted candidate until the supported-version suite and CI are run, the branch is published and a draft PR is opened, and the owner reviews the remaining gates. Do not merge or begin M3.
 
 - Base: draft PR #1 `feat/m1-microgrid-digital-twin` at `aa3cf08ffc22471f3407d99f300dcaf70f5ddd64` as checked October 30, 2026.
 - No existing EDEN agents, Pub/Sub, cloud project or physical system are imported by M2.
