@@ -1,0 +1,43 @@
+name: M5 Preview CI
+on:
+  push:
+    paths:
+      - 'apps/control-room/**'
+      - 'src/eden/sentinel/m5_readonly.py'
+      - 'tests/sentinel/test_m5_preview.py'
+      - 'Dockerfile.m5.api'
+      - 'docker-compose.m5.yml'
+      - '.github/workflows/m5-preview-ci.yml'
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  preview-backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e '.[pipeline,dev]'
+      - run: python -m pytest -q tests/sentinel/test_m5_preview.py
+      - run: python -m pytest -q
+  preview-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/control-room
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/control-room/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run test:contracts
+      - run: npm run typecheck
+      - run: npm run build
