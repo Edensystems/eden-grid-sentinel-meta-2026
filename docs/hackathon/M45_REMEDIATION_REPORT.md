@@ -69,7 +69,7 @@ It was built from the M2+M3+M4 tree with no rebase. M2 was **merged**, not copie
 
 1. **GitHub pull refs / caches** still hold the old commits. File a GitHub Support request to purge `refs/pull/1/head`, `refs/pull/2/head` and cached views.
 2. **Competition eligibility / prior-code rights:** NOT VERIFIED.
-3. **Live Muse Spark request:** approved but **not run**. `MODEL_API_KEY` isn't available to the agent, and AGENTS.md forbids reading `.env`/`.env.local`. The owner must provide the key in the environment or run `scripts/m2_live_smoke.py --live --confirm-billing` personally.
+3. **Live Muse Spark request:** **PASS** on the second owner-approved run (`86bfa54`, PR #4), after the first run exposed a too-small final token ceiling. See `M2_REPORT.md` and `M2_LIVE_SMOKE_2026-10-31.json`. The live M3 tool path is not yet exercised.
 4. **In-memory audit:** a restart loses proposals; single worker only; not durable. Truncation is detectable only if the caller retains `audit_head_hash`.
 5. **Demo-grade M4 auth:** static token plus loopback; default-disabled; must never be exposed publicly.
 6. **Low items:** `/health` reports `phase: M0`; duplicate `functions/scripts/m2_live_smoke.py`; root `README_M*_PATCH.md` files; 24-interval scheduler horizon; `model_requests` counts logical turns.
