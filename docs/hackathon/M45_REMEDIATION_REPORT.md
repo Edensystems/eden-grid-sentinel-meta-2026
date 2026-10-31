@@ -1,54 +1,80 @@
 # M4.5 Remediation Report — EDEN Grid Sentinel
 
-**Status: REMEDIATION COMMITTED ON `integration/m2-m4`. OWNER REVIEW REQUIRED. Not merged, not deployed, no billable model call. M5 not started.**
+**Status: REMEDIATION COMPLETE ON `integration/m2-m4`, CREDENTIAL HISTORY PURGED. OWNER REVIEW REQUIRED. Not merged, not deployed, no billable model call. M5 not started.**
 
-Date: 2026-10-31. Inputs: `docs/ai/audits/m2-m4/` (independent audit, executed evidence).
+Date: 2026-10-31. Inputs: `docs/ai/audits/m2-m4/` (independent audit, executed evidence). The audit documents cite pre-purge SHAs; use the map below.
 
-## Branch
+## History purge (owner-approved, 2026-10-31)
 
-`integration/m2-m4` starts at `c52dbe6` (the pushed M2+M3+M4 tree, 176/176 tests, CI green) and is built non-destructively, with no rebase or force-push:
+Two non-empty `MODEL_API_KEY` values (45 and 48 characters) were committed in `.env.example` in three commits. The owner reports both keys revoked on 2026-10-31 (owner statement, not provider-verified).
 
-| Commit | Purpose |
-|---|---|
-| `8262ccb` | **Merge** of `191bbed` (M2 branch). Restores what the copied M2 lost: `tests/sentinel/test_m2_safeguards.py`, the `meta = ["openai>=2.0,<3"]` extra, and CI installing `.[pipeline,dev,meta]`. `muse.py` / `test_muse.py` were already identical. The `M2_REPORT.md` conflict was resolved in favour of the M2 branch report |
-| `fcb7d83` | Blanks the committed `MODEL_API_KEY` in `.env.example` on this branch |
-| `bdeba9c` | M2 → M3 read-only tool, advisory-only M2 → M4 attachment, and offline end-to-end incident test |
-| (this commit) | Audit documents, this report, and milestone-report addenda |
+Method:
+1. A fresh `--mirror` clone in a scratch directory; the developer checkout was not touched.
+2. `git filter-repo --replace-text` with the two literal values replaced by an empty string. The value file was deleted immediately after use and the values were never printed.
+3. A lease-protected force-push of all five branches, each pinned to its recorded pre-rewrite SHA.
 
-The local commit `64ba350` (M4 without the router registration) is **not** used. The M4 router is registered because the base `c52dbe6` already registers it.
+Verification (from a fresh clone of GitHub after the push):
+- `MODEL_API_KEY` is empty at every branch tip.
+- **0** commits reachable from any branch contain a non-empty value.
+- In `main` and `feat/m1`, the only diff from before the rewrite is the `MODEL_API_KEY` line.
+- `integration/m2-m4`, `feat/m2` and `feat/m3` have **byte-identical trees** to before, so no code changed.
+
+Pre-purge → post-purge commit map:
+
+| Old | New | Commit |
+|---|---|---|
+| `4422e9d` | `ccc68b4` | main: Close the engineering deficiencies |
+| `c3803cc` | `bde08f7` | M1 simulator |
+| `aa3cf08` | `9f4c97e` | M1 docs (`feat/m3-forecast-scheduler`) |
+| `191bbed` | `a01d729` | M2 (`feat/m2-muse-spark-integration`) |
+| `c52dbe6` | `7fb25f4` | M2+M3+M4 (`feat/m1-microgrid-digital-twin`) |
+| `8262ccb` | `1e0ac3b` | merge of M2 into the M2–M4 line |
+| `fcb7d83` | — | "blank MODEL_API_KEY": **pruned**, empty after the purge |
+| `bdeba9c` | `084f1de` | M2→M3→M4 advisory flow and end-to-end incident test |
+| `7708bc1` | `22213b7` | audit documents and first version of this report |
+| `8f34bdb` | `7c82371` | M4 oversight fixes |
+
+**What the purge cannot reach:**
+- GitHub retains the old commits behind `refs/pull/1/head` and `refs/pull/2/head` (PRs #1 and #2, now closed). Only GitHub Support can remove those, along with cached views.
+- Forks and existing clones also keep the old history.
+- Every local checkout made before the purge still holds the old objects and must be re-cloned or reset.
+
+## Branch `integration/m2-m4`
+
+It was built from the M2+M3+M4 tree with no rebase. M2 was **merged**, not copied, which restored `test_m2_safeguards.py`, the `meta = ["openai>=2.0,<3"]` extra and CI installing `.[pipeline,dev,meta]`. The local commit `64ba350` (M4 without the router registration) was not used.
 
 ## Remediation items
 
 | Audit item | Result |
 |---|---|
-| R1 credential exposure | **Owner reports both exposed keys revoked on 2026-10-31.** That's the owner's statement; it has not been provider-verified by the auditor. Value blanked on this branch tip. History still contains both values (`4422e9d` on `main`, `c52dbe6`), and `origin/main` still carries one at its tip until a fix lands there. Purging requires a separately authorized history rewrite |
-| R2 branch topology | Done as above. PR #1 (titled "M1", head `c52dbe6`) and PR #2 (M2) remain open and unchanged; superseding or retitling them is the owner's decision |
-| R3 M4 router | Satisfied by the base. OpenAPI includes `/m4/*`; unconfigured requests return 503 |
-| R4 M2 integration | `get_m3_evaluation` (enum-limited scenarios, single call, duplicate-key and size limits). Evidence is forecast/MAE plus planned values only, with realized outcomes withheld from the model. `LocalApprovalWorkflow.create(advisory=…)` checks scenario and `requires_human_approval` and stores only headline/risk/model. **The restored M2 safeguard test caught that the first version of this change made the API import `muse`. It was fixed with a type-only import; the safeguard still holds** |
-| R5 end-to-end incident | `tests/sentinel/test_e2e_incident.py`: shortfall (1.7175 kWh essential unserved at baseline) → 1.1 kWh shifted plan → fake-client advisory → Guardian denies a tampered plan → rejected proposal can't execute → fresh proposal approved → simulation-only apply → `proposed → approved → applied` chain verifies → realized 1.0 kWh essential unserved (−0.7175 kWh vs baseline), with the flexible trade-off of 0.877 kWh made explicit. Also covers allowlist, forecast-only evidence, and wrong-scenario advisory tests |
-| R8 documentation | This report; addenda to the M2/M3/M4 reports; audit documents committed |
+| R1 credential exposure | Owner-reported revocation; values purged from all branches. GitHub pull refs remain (see above) |
+| R2 branch topology | Merge-based integration branch. PRs #1 (mis-scoped "M1") and #2 closed as superseded, with explanatory comments; replaced by one PR from `integration/m2-m4` |
+| R3 M4 router | Registered (inherited from the M2–M4 tree); unconfigured `/m4` requests return 503 |
+| R4 M2 integration | Allowlisted read-only `get_m3_evaluation`; evidence is forecast-time only. Advisory attachment on M4 proposals has no authority. The restored M2 safeguard caught an API→adapter import in the first draft, which was fixed with a type-only import |
+| R5 end-to-end incident | `test_e2e_incident.py`: shortfall → baseline → plan → fake-client advisory → Guardian denial → rejection → fresh approval → simulation-only apply → audit verification → realized vs baseline (−0.7175 kWh essential, 0.877 kWh flexible trade-off explicit) |
+| **R6 informed approval** | `ProposalView` now shows the exact Guardian-checked plan per interval (forecast solar, essential demand, original and planned flexible kW) plus forecast essential/flexible unserved before and after |
+| **R7 audit gaps** | Every refused decide/apply on an existing proposal adds a hash-chained `denied` event (actor plus reason), including concurrent losers (7 of 8 in the race test), operator mismatch and post-expiry attempts. The `proposed` event records `plan_sha256` over plan, forecast input and policy, re-checked after the Guardian at decide and apply. It catches a coherent edit of all three, which the Guardian alone accepts (regression-tested). `verify_audit(..., expected_head=...)` detects tail truncation |
+| R8 documentation | This report; milestone-report addenda; audit documents |
 
-## Local evidence (executed)
+## Evidence
 
-| Check | Py 3.11.18 | Py 3.12.10 |
-|---|---|---|
-| `pip check` (`.[pipeline,dev]` + `openai>=2.0,<3`) | no broken requirements | no broken requirements |
-| `python -m pytest -q` | **192 passed, 0 skipped** | **192 passed, 0 skipped** |
-| Independent probe (66 checks, `D:\apps\_eden_audit\probes`) | M3/M4 results identical to the audit | same |
+| Check | Result |
+|---|---|
+| Local full suite, Py 3.11.18 / 3.12.10 (`.[pipeline,dev]` + `openai>=2.0,<3`) | **197 passed, 0 skipped** on both |
+| `pip check` | no broken requirements on both |
+| Independent 66-check probe | M3 and M4 figures unchanged from the audit. The expected flips are M2 now connected, the gaps "denied attempts unaudited" and "approver can't see plan" now closed, and expiry now followed by the `denied` event |
+| GitHub Actions on the final SHA (3.11, 3.12, container) | Recorded on the PR for this branch |
 
-There are 192 tests: 176 at `c52dbe6`, plus 12 restored M2 safeguards (the `openai`-dependent one now runs), plus 4 end-to-end tests. Container and GitHub Actions evidence comes from the CI run on this branch's pushed SHA, recorded with the owner handoff. Docker isn't installed on the remediation workstation.
+## Remaining issues
 
-## Remaining issues (not fixed here)
-
-1. **Credential history.** Old values remain in published history and on the `origin/main` tip. Revocation is owner-reported only.
+1. **GitHub pull refs / caches** still hold the old commits. File a GitHub Support request to purge `refs/pull/1/head`, `refs/pull/2/head` and cached views.
 2. **Competition eligibility / prior-code rights:** NOT VERIFIED.
-3. **Live Muse Spark request:** never run. Fake-client tests prove protocol handling only. Needs explicit billing approval and a fresh key.
-4. **M4 oversight gaps (audit R6/R7):** the approver can't see plan intervals; denied and failed attempts aren't audited; tail truncation of the audit chain isn't detected.
-5. **In-memory audit (R9):** a restart erases proposals; single worker only; not durable or tamper-proof.
-6. **Demo-grade M4 auth:** static token plus loopback; default-disabled; must never be exposed publicly.
-7. **Low items:** `/health` still reports `phase: M0`; duplicate `functions/scripts/m2_live_smoke.py`; root `README_M*_PATCH.md` files; 24-interval scheduler horizon; `model_requests` counts logical turns.
-8. **Superseded local work:** branch `feat/m4-guardian-human-approval` (`64ba350`) and the uncommitted edits in the primary working tree. That working tree also changes `.env.example` `PROJECT_ID`, which must stay out of commits. Neither was deleted.
+3. **Live Muse Spark request:** approved but **not run**. `MODEL_API_KEY` isn't available to the agent, and AGENTS.md forbids reading `.env`/`.env.local`. The owner must provide the key in the environment or run `scripts/m2_live_smoke.py --live --confirm-billing` personally.
+4. **In-memory audit:** a restart loses proposals; single worker only; not durable. Truncation is detectable only if the caller retains `audit_head_hash`.
+5. **Demo-grade M4 auth:** static token plus loopback; default-disabled; must never be exposed publicly.
+6. **Low items:** `/health` reports `phase: M0`; duplicate `functions/scripts/m2_live_smoke.py`; root `README_M*_PATCH.md` files; 24-interval scheduler horizon; `model_requests` counts logical turns.
+7. **Stale local state:** the developer checkout's local branches (including the never-pushed `feat/m4-guardian-human-approval` at `64ba350`) and its uncommitted edits predate the purge and contain the old history locally. Its `.env.example` changes `PROJECT_ID`, which must not be committed.
 
 ## Final gate
 
-Owner review requested for: (a) the `integration/m2-m4` branch and its CI run, (b) what happens to PRs #1 and #2, (c) removing the key from the `origin/main` tip and deciding on history purging, (d) whether R6/R7 must close before M5. No merge, deployment, history rewrite, M5 work or billable call without explicit authorization.
+Owner review of the PR from `integration/m2-m4` to `main`. No merge, deployment, M5 work or billable call without explicit authorization.
