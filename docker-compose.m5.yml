@@ -1,0 +1,39 @@
+# Private local staging preview. No public cloud port / no M4 approval API.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.m5.api
+    environment:
+      PORT: '8080'
+      DATA_MODE: simulation
+    expose:
+      - '8080'
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - private_preview
+  control-room:
+    build:
+      context: ./apps/control-room
+      dockerfile: Dockerfile
+    environment:
+      SENTINEL_API_BASE_URL: http://api:8080
+    depends_on:
+      - api
+    ports:
+      - '127.0.0.1:3000:3000'
+    read_only: true
+    tmpfs:
+      - /tmp
+    # Docker does not publish ports for a container attached only to an
+    # internal network, so the UI also joins a loopback-published bridge.
+    # The API stays on the internal network only: no host port, no egress.
+    networks:
+      - private_preview
+      - ui_loopback
+networks:
+  private_preview:
+    internal: true
+  ui_loopback: {}
