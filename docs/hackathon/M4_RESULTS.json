@@ -1,0 +1,70 @@
+{
+  "synthetic_only": true,
+  "not_field_measured": true,
+  "scenario_results": {
+    "critical_priority_school": {
+      "planning_uses_forecast_only": true,
+      "forecast_shifted_kwh": 1.1,
+      "forecast_essential_unserved_before_kwh": 1.8885,
+      "forecast_essential_unserved_after_kwh": 1.0,
+      "realized_essential_unserved_kwh": 1.0,
+      "realized_flexible_unserved_kwh": 0.8770000000000002,
+      "realized_essential_reduction_kwh": 0.7175000000000005,
+      "audit_event_types": [
+        "proposed",
+        "approved",
+        "applied"
+      ],
+      "audit_integrity_valid": true,
+      "mode": "simulation"
+    },
+    "cloudy_school_day": {
+      "planning_uses_forecast_only": true,
+      "forecast_shifted_kwh": 1.2,
+      "forecast_essential_unserved_before_kwh": 2.3,
+      "forecast_essential_unserved_after_kwh": 1.2,
+      "realized_essential_unserved_kwh": 1.5021999999999998,
+      "realized_flexible_unserved_kwh": 1.8,
+      "realized_essential_reduction_kwh": 0.8978000000000002,
+      "audit_event_types": [
+        "proposed",
+        "approved",
+        "applied"
+      ],
+      "audit_integrity_valid": true,
+      "mode": "simulation"
+    },
+    "night_reserve": {
+      "planning_uses_forecast_only": true,
+      "forecast_shifted_kwh": 0.0,
+      "forecast_essential_unserved_before_kwh": 4.08,
+      "forecast_essential_unserved_after_kwh": 4.08,
+      "realized_essential_unserved_kwh": 4.08,
+      "realized_flexible_unserved_kwh": 2.0,
+      "realized_essential_reduction_kwh": 0.0,
+      "audit_event_types": [
+        "proposed",
+        "approved",
+        "applied"
+      ],
+      "audit_integrity_valid": true,
+      "mode": "simulation"
+    },
+    "sunny_surplus": {
+      "planning_uses_forecast_only": true,
+      "forecast_shifted_kwh": 0.0,
+      "forecast_essential_unserved_before_kwh": 0.0,
+      "forecast_essential_unserved_after_kwh": 0.0,
+      "realized_essential_unserved_kwh": 0.0,
+      "realized_flexible_unserved_kwh": 0.0,
+      "realized_essential_reduction_kwh": 0.0,
+      "audit_event_types": [
+        "proposed",
+        "approved",
+        "applied"
+      ],
+      "audit_integrity_valid": true,
+      "mode": "simulation"
+    }
+  }
+}
