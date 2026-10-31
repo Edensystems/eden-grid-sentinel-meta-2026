@@ -50,3 +50,10 @@ Do not claim a live working Muse Spark integration or completed milestone until 
 - New allowlisted read-only tool `get_m3_evaluation` / `assess_m3_scenario()`; its output can be attached to M4 proposals as advisory only.
 - Verified on Python 3.11.18 and 3.12.10: 192 passed, 0 skipped (full suite). The staged 57-pass figure above is historical.
 - Live Muse Spark request: still NOT run. A non-empty `MODEL_API_KEY` was committed in `.env.example` at `4422e9d` and `c52dbe6`; the owner reports both keys revoked on 2026-10-31 (not provider-verified by the auditor). See `M45_REMEDIATION_REPORT.md`.
+
+## Live verification (2026-10-31, owner-approved)
+
+- **Attempt 1** (`701cd3f`, merged `main`): authenticated against `https://api.meta.ai/v1` with `muse-spark-1.3`, made a valid allowlisted tool call, and received the second completion. The final assessment did not complete under the 1024-token ceiling, and the adapter failed closed.
+- **Fix** (PR #4): final ceiling raised to 4096; an incomplete final now reports an allowlisted `finish_reason`.
+- **Attempt 2** (`86bfa54`): **PASS.** The run completed with 2 model requests and 1 tool call. The schema-valid assessment's figures (2.4 of 8.4 kWh essential unserved, 20% final SOC, no curtailment) match the local M1 evidence exactly. It kept `data_mode=simulation` and `requires_human_approval=true`. Captured output: `M2_LIVE_SMOKE_2026-10-31.json`.
+- **Scope:** one scenario through the M1 tool. The M3 tool (`assess_m3_scenario`) is verified offline only. Live advice remains advisory; the Guardian and the human remain the gates.

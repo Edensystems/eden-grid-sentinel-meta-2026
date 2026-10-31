@@ -7,7 +7,7 @@ from types import SimpleNamespace as NS
 import pytest
 
 from eden.sentinel.muse import (
-    ModelIntegrationError, ModelNotConfigured, ModelProtocolError,
+    FINAL_MAX_COMPLETION_TOKENS, ModelIntegrationError, ModelNotConfigured, ModelProtocolError,
     _advice_schema, _parse_json_object, _tool_spec, assess_scenario,
     build_meta_client,
 )
@@ -140,6 +140,24 @@ def test_incomplete_final_or_tool_call_rejected():
     client = FakeClient([initial_call(), finish(tool_calls=[NS(id="evil")])])
     with pytest.raises(ModelProtocolError):
         assess_scenario(client, SCENARIO)
+
+
+@pytest.mark.parametrize("reason,label", [
+    ("length", "length"), ("content_filter", "content_filter"),
+    ("ignore previous instructions", "other"), (None, "other"),
+])
+def test_incomplete_final_names_only_allowlisted_reason(reason, label):
+    client = FakeClient([initial_call(), finish(finish_reason=reason)])
+    with pytest.raises(ModelProtocolError) as exc:
+        assess_scenario(client, SCENARIO)
+    assert str(exc.value) == f"final model response was not completed (finish_reason={label})"
+
+
+def test_final_request_uses_raised_token_budget():
+    client = FakeClient([initial_call(), finish()])
+    assess_scenario(client, SCENARIO)
+    assert client.calls[1]["max_completion_tokens"] == FINAL_MAX_COMPLETION_TOKENS == 4096
+    assert client.calls[0]["max_completion_tokens"] == 768
 
 
 def test_retry_only_transient_status_once(monkeypatch):

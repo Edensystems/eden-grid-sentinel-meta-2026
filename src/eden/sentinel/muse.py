@@ -20,6 +20,17 @@ BASE_URL = "https://api.meta.ai/v1"
 DEFAULT_MODEL = "muse-spark-1.3"
 TOOL_NAME = "get_simulation_summary"
 M3_TOOL_NAME = "get_m3_evaluation"
+# Final-assessment ceiling. Muse Spark counts reasoning against it; 1024 was
+# exhausted in the first live smoke (2026-10-31) before the JSON completed.
+FINAL_MAX_COMPLETION_TOKENS = 4096
+_KNOWN_FINISH_REASONS = {"stop", "length", "content_filter", "tool_calls"}
+
+
+def _incomplete_final(choice: Any) -> "ModelProtocolError":
+    """Name the finish reason (allowlisted values only) without echoing model text."""
+    reason = getattr(choice, "finish_reason", None)
+    label = reason if reason in _KNOWN_FINISH_REASONS else "other"
+    return ModelProtocolError(f"final model response was not completed (finish_reason={label})")
 
 
 class ModelIntegrationError(RuntimeError):
@@ -304,12 +315,12 @@ def assess_scenario(
     })
     final = _request(
         client, model=model, messages=messages,
-        response_format=_advice_schema(), max_completion_tokens=1024,
+        response_format=_advice_schema(), max_completion_tokens=FINAL_MAX_COMPLETION_TOKENS,
         store=False,
     )
     final_choice, final_message = _message(final)
     if getattr(final_choice, "finish_reason", None) != "stop":
-        raise ModelProtocolError("final model response was not completed")
+        raise _incomplete_final(final_choice)
     if getattr(final_message, "tool_calls", None):
         raise ModelProtocolError("unexpected tool calls in final assessment")
     try:
@@ -381,12 +392,12 @@ def assess_m3_scenario(
     })
     final = _request(
         client, model=model, messages=messages,
-        response_format=_advice_schema(), max_completion_tokens=1024,
+        response_format=_advice_schema(), max_completion_tokens=FINAL_MAX_COMPLETION_TOKENS,
         store=False,
     )
     final_choice, final_message = _message(final)
     if getattr(final_choice, "finish_reason", None) != "stop":
-        raise ModelProtocolError("final model response was not completed")
+        raise _incomplete_final(final_choice)
     if getattr(final_message, "tool_calls", None):
         raise ModelProtocolError("unexpected tool calls in final assessment")
     try:
