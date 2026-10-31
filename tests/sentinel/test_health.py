@@ -13,5 +13,8 @@ def test_health_ok():
 
 def test_m1_routes_are_simulation_only():
     paths = set(TestClient(app).get('/openapi.json').json()['paths'])
-    assert paths == {'/health', '/sim/scenarios', '/sim/scenarios/{name}', '/sim/run'}
+    assert paths == {'/health', '/sim/scenarios', '/sim/scenarios/{name}', '/sim/run', '/m3/scenarios', '/m3/evaluate/{name}',
+                     '/m4/proposals', '/m4/proposals/{proposal_id}',
+                     '/m4/proposals/{proposal_id}/decision',
+                     '/m4/proposals/{proposal_id}/execute-simulation'}
     assert not any('act' in path or 'control' in path for path in paths)

@@ -34,3 +34,12 @@ def run_fixture(name: str) -> SimulationResult:
 @app.post("/sim/run", response_model=SimulationResult, tags=["digital-twin"])
 def run_custom(request: SimulationRequest) -> SimulationResult:
     return run_simulation(request)
+
+
+# M3 simulator-only forecasts and scheduling (no model/device calls).
+from eden.sentinel.m3_routes import router as m3_router
+app.include_router(m3_router)
+
+# M4 opt-in local-only approval demonstration. Disabled unless operator config is set.
+from eden.sentinel.m4_routes import router as m4_router
+app.include_router(m4_router)
