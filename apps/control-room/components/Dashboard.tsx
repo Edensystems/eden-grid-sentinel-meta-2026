@@ -75,7 +75,7 @@ export function Dashboard(){
   const flexChange=data?data.flexibleScheduledKwh-data.flexibleBaselineKwh:0;
   return <div className="shell">
     <aside className="sidebar">
-      <div className="brand"><span className="brand-mark">E<span className="brand-dot"/></span><div><strong>EDEN</strong><small>GRID SENTINEL</small></div></div>
+      <div className="brand"><span className="brand-mark"><img src="/eden-logo-192.png" alt="EDEN logo" width={38} height={38}/></span><div><strong>EDEN</strong><small>GRID SENTINEL</small></div></div>
       <div className="nav-title">WORKSPACE</div>
       <nav className="navigation" aria-label="Main navigation">
         <a className="nav-link active" href="#overview">{icons.layers} <span>Overview</span></a>
@@ -94,7 +94,7 @@ export function Dashboard(){
         <section className="hero"><div className="hero-text"><div className="hero-eyebrow"><span className="accent-line"/> OPERATIONS CONTROL ROOM</div><h1>Energy, understood.</h1>
           <p>Predict supply constraints. Compare feasible schedules. Protect essential school loads—all inside a transparent, synthetic digital twin.</p>
           <div className="hero-tags"><span className="tag safe-tag">● SIMULATION ONLY</span><span className="tag">M5 / READ-ONLY PREVIEW</span></div></div>
-          <div className="hero-art"><div className="orbit outer"/><div className="orbit middle"/><div className="orbit inner"/><div className="orbit-core">E</div><span className="orbit-label one">FORECAST</span><span className="orbit-label two">OPTIMIZE</span><span className="orbit-label three">PROTECT</span></div></section>
+          <div className="hero-art"><div className="orbit outer"/><div className="orbit middle"/><div className="orbit inner"/><div className="orbit-core"><img src="/eden-logo-192.png" alt="" width={64} height={64}/></div><span className="orbit-label one">FORECAST</span><span className="orbit-label two">OPTIMIZE</span><span className="orbit-label three">PROTECT</span></div></section>
         <section className="toolbar"><div className="section-intro"><span className="section-kicker">01 / LIVE VIEW</span><h2>Microgrid overview</h2><p>Measured from deterministic simulations. No connected sensors.</p></div>
           <div className="controls"><label className="select-label" htmlFor="scenario">Scenario</label><select id="scenario" value={scenario} onChange={e=>{if(isScenario(e.target.value))setScenario(e.target.value)}}>{available.map(key=><option key={key} value={key}>{SCENARIO_TITLES[key]}</option>)}</select>
             <button type="button" className="outline-button" onClick={()=>void load(scenario)} disabled={loading} aria-label="Refresh scenario">{icons.refresh}</button></div></section>
