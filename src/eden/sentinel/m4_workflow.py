@@ -76,6 +76,8 @@ class ProposalView(TwinModel):
     advisory_model: str | None = None
     advisory_risk_level: str | None = None
     advisory_headline: str | None = None
+    advisory_explanation: str | None = None
+    advisory_next_step: str | None = None
     realized_essential_unserved_kwh: float | None = None
     realized_flexible_unserved_kwh: float | None = None
     realized_essential_reduction_kwh: float | None = None
@@ -169,6 +171,8 @@ class LocalApprovalWorkflow:
             advisory_model=rec.advisory.model if rec.advisory else None,
             advisory_risk_level=rec.advisory.assessment.risk_level if rec.advisory else None,
             advisory_headline=rec.advisory.assessment.headline if rec.advisory else None,
+            advisory_explanation=rec.advisory.assessment.explanation if rec.advisory else None,
+            advisory_next_step=rec.advisory.assessment.suggested_next_step if rec.advisory else None,
             realized_essential_unserved_kwh=rec.realized_essential_unserved_kwh,
             realized_flexible_unserved_kwh=rec.realized_flexible_unserved_kwh,
             realized_essential_reduction_kwh=rec.realized_essential_reduction_kwh,

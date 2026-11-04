@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { TrendChart } from './TrendChart';
+import { IncidentPanel } from './IncidentPanel';
 import type { DashboardData } from '@/lib/contract';
 import { isScenario, SCENARIOS, SCENARIO_TITLES, type Scenario } from '@/lib/scenarios';
 
@@ -81,6 +82,7 @@ export function Dashboard(){
         <a className="nav-link active" href="#overview">{icons.layers} <span>Overview</span></a>
         <a className="nav-link" href="#energy">{icons.activity}<span>Energy analytics</span></a>
         <a className="nav-link" href="#comparison">{icons.bolt}<span>Load scheduling</span></a>
+        <a className="nav-link" href="#incident">{icons.clock}<span>Incident response</span></a>
         <a className="nav-link" href="#safety">{icons.shield}<span>Safety boundary</span></a>
       </nav>
       <div className="sidebar-bottom"><div className="sidebar-system"><span className="eyebrow">SYSTEM CONTEXT</span>
@@ -116,7 +118,8 @@ export function Dashboard(){
             </div><div className="panel"><div className="panel-heading"><div><span className="section-kicker">05 / PLAN</span><h3>Scheduling decisions</h3><p>Bounded local search · Not a global optimum</p></div><span className="metric-chip">{data.schedulingStatus}</span></div>
               {data.moves.length?<div className="moves-list">{data.moves.slice(0,7).map((move,i)=><div className="move" key={i}><span className="move-number">{String(i+1).padStart(2,'0')}</span><div><strong>Retimed flexible load</strong><small>Interval {move.from+1} → Interval {move.to+1}</small></div><b>{number(move.energyKwh,2)} kWh</b></div>)}{data.moves.length>7?<p className="muted-note">+ {data.moves.length-7} more moves in this scenario</p>:null}</div>:<div className="empty-moves">No shift was selected for this scenario.</div>}
             </div></section>
-          <section className="bottom-grid" id="safety"><div className="safety-panel"><div className="safety-icon">{icons.shield}</div><div><span className="section-kicker">06 / TRUST BOUNDARY</span><h3>Guardian & operator approval</h3><p>The M4 approval interface is intentionally not connected to this staging preview. This page cannot create, approve, or execute proposals.</p><div className="security-tags"><span>Read-only</span><span>Control disabled</span><span>No device access</span></div></div></div>
+          <IncidentPanel scenario={scenario} scenarioTitle={SCENARIO_TITLES[scenario]}/>
+          <section className="bottom-grid" id="safety"><div className="safety-panel"><div className="safety-icon">{icons.shield}</div><div><span className="section-kicker">06 / TRUST BOUNDARY</span><h3>Guardian & operator approval</h3><p>Proposals are created, approved, and applied only through the Incident panel in loopback operator mode: every plan is re-checked by the Guardian and needs an explicit human decision. The read-only preview cannot do any of this.</p><div className="security-tags"><span>Read-only</span><span>Control disabled</span><span>No device access</span></div></div></div>
             <div className="panel provenance-panel"><span className="section-kicker">EVIDENCE & PROVENANCE</span><h3>What these numbers mean</h3><div className="evidence-row"><span>Data source</span><b>Simulated fixtures</b></div><div className="evidence-row"><span>Forecast model</span><b>Previous-day analogue</b></div><div className="evidence-row"><span>Solar MAE</span><b>{number(data.solarMaeKw,3)} kW</b></div><div className="evidence-row"><span>Reserve violations</span><b>{data.reserveViolations}</b></div><div className="evidence-row"><span>Energy residual</span><b>{data.balanceResidualKwh.toExponential(2)} kWh</b></div></div></section>
         </>:null}
         <footer className="footer"><div>EDEN GRID SENTINEL <span>·</span> SIMULATION ONLY <span>·</span> NOT FOR REAL-WORLD ELECTRICAL CONTROL</div><div className="footer-actions"><label><input type="checkbox" checked={auto} onChange={e=>setAuto(e.target.checked)}/> Auto-refresh (20s)</label><span>{lastUpdated?`Updated ${lastUpdated.toLocaleTimeString()}`:'Awaiting data'}</span></div></footer>

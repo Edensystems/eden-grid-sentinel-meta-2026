@@ -1,0 +1,295 @@
+{
+ "applied_then_denied": {
+  "advisory_explanation": null,
+  "advisory_headline": null,
+  "advisory_model": null,
+  "advisory_next_step": null,
+  "advisory_risk_level": null,
+  "approved_by": "panel-operator",
+  "audit": [
+   {
+    "actor": "system",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "proposed",
+    "hash": "b84ba46f23dcff38653a03a08538dc764db38f53d5e5c9f7bc984d3ffb633cbe",
+    "note": "forecast-based schedule proposed; no actuation; plan_sha256=07154e73f7e4457d111dac7a87015c212a57e38e98e476711d70f973dda0c758",
+    "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "proposal_id": "77692b8d-d6cf-4cdc-a797-074e9db03d35",
+    "sequence": 1
+   },
+   {
+    "actor": "panel-operator",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "approved",
+    "hash": "06e50487bc0b0c0e30c15bec09b2626bce1a4e248cf2f98ec19b4cd89dc579c7",
+    "note": "human decision on simulation-only plan",
+    "previous_hash": "b84ba46f23dcff38653a03a08538dc764db38f53d5e5c9f7bc984d3ffb633cbe",
+    "proposal_id": "77692b8d-d6cf-4cdc-a797-074e9db03d35",
+    "sequence": 2
+   },
+   {
+    "actor": "panel-operator",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "applied",
+    "hash": "dcf8341fa1204771239c607c7ae20d88656010f2d81f6c6becb6a449b03047f3",
+    "note": "applied to synthetic in-memory twin ONLY",
+    "previous_hash": "06e50487bc0b0c0e30c15bec09b2626bce1a4e248cf2f98ec19b4cd89dc579c7",
+    "proposal_id": "77692b8d-d6cf-4cdc-a797-074e9db03d35",
+    "sequence": 3
+   },
+   {
+    "actor": "panel-operator",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "denied",
+    "hash": "ff796f0f000e4593c0eccad3f5106ab5113cb11befc77caa5011b564884f60f3",
+    "note": "execution_requires_approval",
+    "previous_hash": "dcf8341fa1204771239c607c7ae20d88656010f2d81f6c6becb6a449b03047f3",
+    "proposal_id": "77692b8d-d6cf-4cdc-a797-074e9db03d35",
+    "sequence": 4
+   }
+  ],
+  "audit_head_hash": "ff796f0f000e4593c0eccad3f5106ab5113cb11befc77caa5011b564884f60f3",
+  "expires_at": "2026-11-04T12:15:00Z",
+  "forecast_essential_unserved_baseline_kwh": 1.8885,
+  "forecast_essential_unserved_planned_kwh": 1.0,
+  "forecast_flexible_unserved_baseline_kwh": 0.0,
+  "forecast_flexible_unserved_planned_kwh": 1.0479999999999998,
+  "forecast_shifted_kwh": 1.1,
+  "guardian": {
+   "allowed": true,
+   "forecast_essential_unserved_after_kwh": 1.0,
+   "forecast_essential_unserved_before_kwh": 1.8885,
+   "mode": "simulation",
+   "predicted_reserve_violations": 0,
+   "reasons": [],
+   "warnings": [
+    "forecast indicates some essential load will remain unserved",
+    "plan increases flexible-load shortfall"
+   ]
+  },
+  "mode": "simulation",
+  "plan_sha256": "07154e73f7e4457d111dac7a87015c212a57e38e98e476711d70f973dda0c758",
+  "planned_intervals": [
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 3.8,
+    "original_flexible_kw": 1.5,
+    "planned_flexible_kw": 0.3999999999999998,
+    "timestamp": "2026-10-28T07:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 0.0,
+    "timestamp": "2026-10-28T08:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 1.0999999999999999,
+    "timestamp": "2026-10-28T09:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 0.0,
+    "timestamp": "2026-10-28T10:00:00Z"
+   }
+  ],
+  "proposal_id": "77692b8d-d6cf-4cdc-a797-074e9db03d35",
+  "realized_essential_reduction_kwh": 0.7175000000000005,
+  "realized_essential_unserved_kwh": 1.0,
+  "realized_flexible_unserved_kwh": 0.8770000000000002,
+  "scenario": "critical_priority_school",
+  "status": "applied"
+ },
+ "pending_with_advisory": {
+  "advisory_explanation": "Forecast scheduling reduces essential shortfall at a flexible-load cost.",
+  "advisory_headline": "Synthetic solar shortfall threatens essential load",
+  "advisory_model": "muse-spark-1.3",
+  "advisory_next_step": "Guardian-check the plan and seek explicit operator approval.",
+  "advisory_risk_level": "high",
+  "approved_by": null,
+  "audit": [
+   {
+    "actor": "system",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "proposed",
+    "hash": "f757387a83401aa9362a2bafe79ae3d75116f1c1c9849de4672ba678d5801605",
+    "note": "forecast-based schedule proposed; no actuation; plan_sha256=07154e73f7e4457d111dac7a87015c212a57e38e98e476711d70f973dda0c758",
+    "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "proposal_id": "264ddc20-069e-4c6d-b7ad-1890e476a39f",
+    "sequence": 1
+   }
+  ],
+  "audit_head_hash": "f757387a83401aa9362a2bafe79ae3d75116f1c1c9849de4672ba678d5801605",
+  "expires_at": "2026-11-04T12:15:00Z",
+  "forecast_essential_unserved_baseline_kwh": 1.8885,
+  "forecast_essential_unserved_planned_kwh": 1.0,
+  "forecast_flexible_unserved_baseline_kwh": 0.0,
+  "forecast_flexible_unserved_planned_kwh": 1.0479999999999998,
+  "forecast_shifted_kwh": 1.1,
+  "guardian": {
+   "allowed": true,
+   "forecast_essential_unserved_after_kwh": 1.0,
+   "forecast_essential_unserved_before_kwh": 1.8885,
+   "mode": "simulation",
+   "predicted_reserve_violations": 0,
+   "reasons": [],
+   "warnings": [
+    "forecast indicates some essential load will remain unserved",
+    "plan increases flexible-load shortfall"
+   ]
+  },
+  "mode": "simulation",
+  "plan_sha256": "07154e73f7e4457d111dac7a87015c212a57e38e98e476711d70f973dda0c758",
+  "planned_intervals": [
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 3.8,
+    "original_flexible_kw": 1.5,
+    "planned_flexible_kw": 0.3999999999999998,
+    "timestamp": "2026-10-28T07:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 0.0,
+    "timestamp": "2026-10-28T08:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 1.0999999999999999,
+    "timestamp": "2026-10-28T09:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 0.0,
+    "timestamp": "2026-10-28T10:00:00Z"
+   }
+  ],
+  "proposal_id": "264ddc20-069e-4c6d-b7ad-1890e476a39f",
+  "realized_essential_reduction_kwh": null,
+  "realized_essential_unserved_kwh": null,
+  "realized_flexible_unserved_kwh": null,
+  "scenario": "critical_priority_school",
+  "status": "pending"
+ },
+ "rejected_then_denied": {
+  "advisory_explanation": null,
+  "advisory_headline": null,
+  "advisory_model": null,
+  "advisory_next_step": null,
+  "advisory_risk_level": null,
+  "approved_by": null,
+  "audit": [
+   {
+    "actor": "system",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "proposed",
+    "hash": "99ce58cdaa1f370e129f78966acc0ed02892bf17124b9dc47389d13a02c260cf",
+    "note": "forecast-based schedule proposed; no actuation; plan_sha256=07154e73f7e4457d111dac7a87015c212a57e38e98e476711d70f973dda0c758",
+    "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "proposal_id": "3b28c124-a37c-4cd3-bd2d-4c92faa1a64f",
+    "sequence": 1
+   },
+   {
+    "actor": "panel-operator",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "rejected",
+    "hash": "c4639590e8fd0ca5b364b1f976669e0f424a132422d32fc91eb57f0df36b272a",
+    "note": "human decision on simulation-only plan",
+    "previous_hash": "99ce58cdaa1f370e129f78966acc0ed02892bf17124b9dc47389d13a02c260cf",
+    "proposal_id": "3b28c124-a37c-4cd3-bd2d-4c92faa1a64f",
+    "sequence": 2
+   },
+   {
+    "actor": "panel-operator",
+    "at": "2026-11-04T12:00:00Z",
+    "event": "denied",
+    "hash": "4d1b7ef83d357f865b65b0e05001c7d44675fc95d3a6a1c8f31149aee10c6148",
+    "note": "execution_requires_approval",
+    "previous_hash": "c4639590e8fd0ca5b364b1f976669e0f424a132422d32fc91eb57f0df36b272a",
+    "proposal_id": "3b28c124-a37c-4cd3-bd2d-4c92faa1a64f",
+    "sequence": 3
+   }
+  ],
+  "audit_head_hash": "4d1b7ef83d357f865b65b0e05001c7d44675fc95d3a6a1c8f31149aee10c6148",
+  "expires_at": "2026-11-04T12:15:00Z",
+  "forecast_essential_unserved_baseline_kwh": 1.8885,
+  "forecast_essential_unserved_planned_kwh": 1.0,
+  "forecast_flexible_unserved_baseline_kwh": 0.0,
+  "forecast_flexible_unserved_planned_kwh": 1.0479999999999998,
+  "forecast_shifted_kwh": 1.1,
+  "guardian": {
+   "allowed": true,
+   "forecast_essential_unserved_after_kwh": 1.0,
+   "forecast_essential_unserved_before_kwh": 1.8885,
+   "mode": "simulation",
+   "predicted_reserve_violations": 0,
+   "reasons": [],
+   "warnings": [
+    "forecast indicates some essential load will remain unserved",
+    "plan increases flexible-load shortfall"
+   ]
+  },
+  "mode": "simulation",
+  "plan_sha256": "07154e73f7e4457d111dac7a87015c212a57e38e98e476711d70f973dda0c758",
+  "planned_intervals": [
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 3.8,
+    "original_flexible_kw": 1.5,
+    "planned_flexible_kw": 0.3999999999999998,
+    "timestamp": "2026-10-28T07:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 0.0,
+    "timestamp": "2026-10-28T08:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 1.0999999999999999,
+    "timestamp": "2026-10-28T09:00:00Z"
+   },
+   {
+    "duration_minutes": 60,
+    "essential_demand_kw": 1.0,
+    "forecast_solar_kw": 0.0,
+    "original_flexible_kw": 0.0,
+    "planned_flexible_kw": 0.0,
+    "timestamp": "2026-10-28T10:00:00Z"
+   }
+  ],
+  "proposal_id": "3b28c124-a37c-4cd3-bd2d-4c92faa1a64f",
+  "realized_essential_reduction_kwh": null,
+  "realized_essential_unserved_kwh": null,
+  "realized_flexible_unserved_kwh": null,
+  "scenario": "critical_priority_school",
+  "status": "rejected"
+ }
+}

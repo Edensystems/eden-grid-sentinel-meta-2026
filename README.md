@@ -33,6 +33,10 @@ npm run dev
 
 Open `http://127.0.0.1:3000`. All displayed scenarios and metrics are synthetic and read-only; the UI does **not** connect to the M4 approval demo or make Meta API calls.
 
+### Incident loop (optional loopback operator mode)
+
+The dashboard's **Incident panel** runs the full loop on one screen: detect → optional live Meta Muse Spark advisory → Guardian check → human approve/reject → simulated apply → hash-chained audit, including deliberate denied attempts. It needs the M4 operator API on loopback and two server-only variables. Without them the panel stays disabled and the dashboard remains read-only. Live advisories are off unless the operator API also sets `M4_ALLOW_LIVE_ADVISORY=1` (billable). See [`docs/hackathon/INCIDENT_PANEL.md`](docs/hackathon/INCIDENT_PANEL.md).
+
 ## Architecture and constraints
 
 ```text
@@ -59,7 +63,7 @@ For synthetic `critical_priority_school`, unmet essential energy changes from **
 
 ## Meta AI integration evidence
 
-An authorized live Muse Spark 1.3 smoke test (Oct 31, 2026) validated one M1 scenario: two requests, one approved tool call, structured advisory requiring human approval. Evidence: `docs/hackathon/M2_LIVE_SMOKE_2026-10-31.json`. M3→M4 integration is reproducibly tested with a **fake** model client; the M5 UI does not claim live model access. SAM 3.1 code currently constructs optional segmentation requests only, not validated visual inference.
+An authorized live Muse Spark 1.3 smoke test (Oct 31, 2026) validated one M1 scenario: two requests, one approved tool call, structured advisory requiring human approval. Evidence: `docs/hackathon/M2_LIVE_SMOKE_2026-10-31.json`. On Nov 4, 2026 one owner-approved live run went through the dashboard's Incident panel on `critical_priority_school`: two requests, one allowlisted M3 tool call, and a schema-valid advisory attached to a pending proposal, which the operator then approved. Evidence: `docs/hackathon/LIVE_INCIDENT_ADVISORY_2026-11-04.json`. M3→M4 integration is reproducibly tested with a **fake** model client; the M5 UI does not claim live model access. SAM 3.1 code currently constructs optional segmentation requests only, not validated visual inference.
 
 ## Safety, limitations, and provenance
 
@@ -69,6 +73,7 @@ The M4 approval system uses local in-memory state and is not appropriate for pub
 
 - `docs/hackathon/M6_SUBMISSION_DRAFT.md` — project statement and verified claims.
 - `docs/hackathon/M6_RUNBOOK.md` — reproducibility, local demo, and actual evidence capture.
+- `docs/hackathon/INCIDENT_PANEL.md` — operator-mode incident loop: setup, safety boundaries, demo script.
 - `docs/hackathon/M6_REPORT.md` — final engineering and release review.
 
 **Project source:** https://github.com/Edensystems/eden-grid-sentinel-meta-2026

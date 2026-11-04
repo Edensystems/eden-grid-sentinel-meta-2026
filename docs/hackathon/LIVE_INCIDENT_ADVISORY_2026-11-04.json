@@ -1,0 +1,53 @@
+{
+  "captured_utc_date": "2026-11-04",
+  "branch": "feat/incident-panel",
+  "base_commit": "03c6a3222df6299311e5e6231e410a4c2f3d01a2",
+  "working_tree": "incident panel changes uncommitted at capture time; see the commit that adds this file",
+  "path": "control-room Incident panel -> Next.js /api/operator/proposals -> eden.sentinel.api POST /m4/proposals {live_advisory: true} -> muse.assess_m3_scenario",
+  "endpoint": "https://api.meta.ai/v1",
+  "authorization": "owner-approved billable demo run (2026-11-04); MODEL_API_KEY entered by the owner via hidden prompt into the operator API process, checked against the exposed legacy PR refs, never displayed or written to disk",
+  "model_requests": 2,
+  "tool_calls_executed": 1,
+  "note": "Single live run recorded in the demo video. Dashboard-normalized proposal view below; the advisory is advisory-only and the proposal was pending (not approved) when returned.",
+  "proposal": {
+    "mode": "simulation",
+    "scenario": "critical_priority_school",
+    "status": "pending",
+    "guardian": {
+      "allowed": true,
+      "reasons": [],
+      "warnings": [
+        "forecast indicates some essential load will remain unserved",
+        "plan increases flexible-load shortfall"
+      ],
+      "essentialBeforeKwh": 1.8885,
+      "essentialAfterKwh": 1,
+      "reserveViolations": 0
+    },
+    "shiftedKwh": 1.1,
+    "planSha256": "07154e73f7e4457d111dac7a87015c212a57e38e98e476711d70f973dda0c758",
+    "forecast": {
+      "essentialBaselineKwh": 1.8885,
+      "essentialPlannedKwh": 1,
+      "flexibleBaselineKwh": 0,
+      "flexiblePlannedKwh": 1.0479999999999998
+    },
+    "approvedBy": null,
+    "advisory": {
+      "model": "muse-spark-1.3",
+      "riskLevel": "high",
+      "headline": "Degraded synthetic schedule leaves 1.0 kWh essential school load unserved",
+      "explanation": "Synthetic M3 forecast-scheduler simulation, not field measurements, shows degraded status. Forecasts were accurate but scheduled result still leaves 1.0 kWh essential unserved (improved from 1.8885 kWh baseline) with 1.048 kWh flexible unserved to enable 1.1 kWh shifted. Essential school loads have priority but remain at risk.",
+      "nextStep": "Propose protection of essential school loads and continued flexible curtailment for review by deterministic Guardian and human operator before any action; nothing approved or executed."
+    },
+    "realized": null
+  },
+  "audit_at_creation": [
+    {
+      "sequence": 1,
+      "event": "proposed",
+      "actor": "system",
+      "at": "2026-11-04T20:12:45.075963Z"
+    }
+  ]
+}
