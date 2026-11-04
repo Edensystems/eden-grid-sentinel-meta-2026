@@ -1,3 +1,5 @@
+<p align="center"><img src="apps/control-room/public/eden-logo.png" alt="EDEN logo" width="220"></p>
+
 # EDEN Grid Sentinel
 
 **AI-assisted energy resilience for solar-powered schools** · RavensAI · Meta Global AI Developer Hackathon 2026 · **Push the Frontier**
@@ -66,8 +68,6 @@ The M4 approval system uses local in-memory state and is not appropriate for pub
 ## Submission materials
 
 - `docs/hackathon/M6_SUBMISSION_DRAFT.md` — project statement and verified claims.
-- `docs/hackathon/M6_VIDEO_SCRIPT.md` — two-minute demonstration storyboard.
-- `docs/hackathon/M6_SUBMISSION_CHECKLIST.md` — owner/reviewer submission gates.
 - `docs/hackathon/M6_RUNBOOK.md` — reproducibility, local demo, and actual evidence capture.
 - `docs/hackathon/M6_REPORT.md` — final engineering and release review.
 
