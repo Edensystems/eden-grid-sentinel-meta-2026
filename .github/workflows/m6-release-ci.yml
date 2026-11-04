@@ -1,0 +1,30 @@
+name: M6 Submission Evidence CI
+on:
+  push:
+    paths:
+      - 'scripts/m6_evidence.py'
+      - 'tests/sentinel/test_m6_release.py'
+      - 'docs/hackathon/M6_*'
+      - '.github/workflows/m6-release-ci.yml'
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  offline-evidence:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11','3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e '.[pipeline,dev,meta]'
+      - run: python -m pytest -q tests/sentinel/test_m6_release.py tests/sentinel/test_e2e_incident.py
+      - run: python scripts/m6_evidence.py --out-dir artifacts/m6
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eden-m6-evidence-py${{ matrix.python-version }}
+          path: artifacts/m6/
+          retention-days: 7

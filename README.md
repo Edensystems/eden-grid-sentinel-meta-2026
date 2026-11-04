@@ -1,65 +1,74 @@
-# EDEN — Education, Energy & Nature
+# EDEN Grid Sentinel
 
-Multi-agent platform by RavensAI: **Sense → Think → Learn → Act**, with a Guardian policy gate.
-Stages communicate over Pub/Sub and record each episode in Firebase RTDB under
-`eden/{communityId}/episodes/{senseId}`.
+**AI-assisted energy resilience for solar-powered schools** · RavensAI · Meta Global AI Developer Hackathon 2026 · **Push the Frontier**
 
-This repository also contains **EDEN Grid Sentinel**, RavensAI's entry for the Meta Global AI Developer
-Hackathon 2026: an AI-assisted solar microgrid operator prototype. Status: **M0 scaffold** — `/health`
-endpoint and Pydantic event contracts only. See [docs/hackathon/](docs/hackathon/).
+EDEN Grid Sentinel is a simulation-first prototype exploring how solar-powered schools could prioritize essential loads during solar shortages. It combines a deterministic solar/battery digital twin, a transparent previous-day analogue forecast, bounded flexible-load scheduling, Meta Muse Spark advisory tool-calling, an independent Guardian, local human approval, and a read-only Next.js control-room dashboard.
 
-## Layout
+**Simulation only.** No physical control, field telemetry, verified tariff savings, or production authorization is claimed.
 
-```
-src/eden/
-  core/          config (env / .env), JSON logging
-  integrations/  rtdb.py (Firebase init + episode writes), pubsub_io.py
-  agents/        sense, think, learn, act, guardian
-  services/      FastAPI Pub/Sub push endpoints; pipeline.py holds the shared stage logic
-  sentinel/      Grid Sentinel (hackathon-new): api.py, schemas.py
-functions/       Firebase Functions (RTDB triggers -> agent URLs)
-jobs/sim_job/    Cloud Run job stub
-tests/           offline tests (pipeline + tests/sentinel)
-docs/            setup guide, hackathon brief, milestones, architecture, provenance
+## Quick start (Python 3.11/3.12; Node 22)
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[pipeline,dev,meta]"
+python -m pytest -q
+python scripts/m6_evidence.py --out-dir artifacts/m6
+python -m uvicorn eden.sentinel.m5_readonly:app --host 127.0.0.1 --port 8000
 ```
 
-## Run locally
+In another terminal:
 
-Python 3.11 or 3.12. Windows step-by-step: [docs/SETUP_WINDOWS.md](docs/SETUP_WINDOWS.md).
-
-```bash
-python -m venv .venv && . .venv/Scripts/activate
-pip install -e ".[pipeline,dev]"                   # Sentinel only: ".[dev]"
-cp .env.example .env                               # fill in values
-
-pytest -q                                          # offline, no cloud access needed
-uvicorn eden.sentinel.api:app --port 8000          # Grid Sentinel /health
-uvicorn eden.services.think:app --port 8080        # pipeline stage: think / learn / act
-python -m eden.agents.sense                        # simulated sensor stream
+```powershell
+cd apps/control-room
+npm ci
+npm run test:contracts
+npm run typecheck
+npm run build
+Copy-Item .env.example .env.local
+npm run dev
 ```
 
-Credentials come from Application Default Credentials: the attached service account on
-Cloud Run, or `GOOGLE_APPLICATION_CREDENTIALS` pointing to a key **outside** the repo locally.
+Open `http://127.0.0.1:3000`. All displayed scenarios and metrics are synthetic and read-only; the UI does **not** connect to the M4 approval demo or make Meta API calls.
 
-## Deploy the pipeline
+## Architecture and constraints
 
-One image serves every stage; choose it with `EDEN_SERVICE`:
+```text
+Synthetic M1 grid digital twin
+         ↓
+M3 historical-analogue forecast → bounded flexible-load scheduling
+         ↓
+M2 Muse Spark (allowlisted read-only tool; advisory-only reasoning)
+         ↓
+M4 Guardian (re-check physics, reserve and schedule constraints)
+         ↓
+Explicit local operator approval or rejection
+         ↓
+Simulation-only application + in-memory audit
 
-```bash
-gcloud run deploy eden-think --source . --set-env-vars EDEN_SERVICE=think,FIREBASE_DB_URL=...
+Separately: M5 read-only preview API → Next.js Control Room
 ```
 
-| Service | Endpoint        | Publishes to        |
-|---------|-----------------|---------------------|
-| think   | `/pubsub/think` | `eden-think-output` |
-| learn   | `/pubsub/learn` | `eden-learn-tasks`  |
-| act     | `/pubsub/act`   | `eden-act-actions`  |
+The forecast and scheduler run on independently supplied synthetic prior-day and target-day fixtures. The schedule is chosen without seeing future solar values and is evaluated afterward on held-out actual synthetic solar. The scheduler is a local search, **not** a globally optimal solver.
 
-## Development rules (Grid Sentinel)
+## Reproducible result
 
-- No automatic physical actuation. All energy operations are simulated.
-- No API keys or service accounts in commits, logs, screenshots, or documentation.
-- No unverifiable model or performance claims; record actual evidence.
-- Milestones must be tested, documented, and approved before advancement.
-- Keep hackathon code in `src/eden/sentinel/` and record any reuse of pre-existing EDEN code in
-  [BASELINE.md](docs/hackathon/BASELINE.md).
+For synthetic `critical_priority_school`, unmet essential energy changes from **1.7175 kWh to 1.0000 kWh** (a 0.7175 kWh reduction), while unserved flexible demand increases from 0 to **0.8770 kWh**. This illustrates prioritization, not energy creation or validated electricity savings. See `docs/hackathon/M3_RESULTS.json` and the M6 offline evidence artifacts produced with `scripts/m6_evidence.py`.
+
+## Meta AI integration evidence
+
+An authorized live Muse Spark 1.3 smoke test (Oct 31, 2026) validated one M1 scenario: two requests, one approved tool call, structured advisory requiring human approval. Evidence: `docs/hackathon/M2_LIVE_SMOKE_2026-10-31.json`. M3→M4 integration is reproducibly tested with a **fake** model client; the M5 UI does not claim live model access. SAM 3.1 code currently constructs optional segmentation requests only, not validated visual inference.
+
+## Safety, limitations, and provenance
+
+The M4 approval system uses local in-memory state and is not appropriate for public deployment. M5 exposes only GET health and synthetic M3 evaluation routes. No hardware, model credentials, or legacy EDEN Firebase services are needed to run this demo. Previous EDEN infrastructure is present in the repository; see `docs/hackathon/BASELINE.md` and `docs/hackathon/M45_REMEDIATION_REPORT.md` for origin and integration notes. Official hackathon prior-code eligibility must be confirmed with the accepted-participant rules. The owner reports revocation of previously exposed Meta API keys; some old GitHub pull refs/caches may remain accessible pending support cleanup.
+
+## Submission materials
+
+- `docs/hackathon/M6_SUBMISSION_DRAFT.md` — project statement and verified claims.
+- `docs/hackathon/M6_VIDEO_SCRIPT.md` — two-minute demonstration storyboard.
+- `docs/hackathon/M6_SUBMISSION_CHECKLIST.md` — owner/reviewer submission gates.
+- `docs/hackathon/M6_RUNBOOK.md` — reproducibility, local demo, and actual evidence capture.
+- `docs/hackathon/M6_REPORT.md` — final engineering and release review.
+
+**Project source:** https://github.com/Edensystems/eden-grid-sentinel-meta-2026
