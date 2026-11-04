@@ -110,4 +110,4 @@ No test was weakened, skipped or removed.
 
 ## GitHub Actions
 
-CI results for the pushed candidate SHA are recorded in `M6_RELEASE_STATUS.md` after the runs complete.
+On `1bac27a`, all 6 runs succeeded (CI, M5 Preview CI and M6 Submission Evidence CI, on both push and pull_request). CI reports 212 passed on 3.11 and 3.12, the frontend green on Node 22, and fingerprint `aa4bbb88…ab5b` on both Python versions. Run URLs are in `M6_RELEASE_STATUS.md`.

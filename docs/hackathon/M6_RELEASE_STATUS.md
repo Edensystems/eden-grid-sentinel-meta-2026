@@ -1,6 +1,6 @@
 # M6 Release Status
 
-## Technical status: **TECHNICALLY VERIFIED FOR RELEASE CANDIDATE** — pending CI confirmation on the pushed SHA
+## Technical status: **TECHNICALLY VERIFIED FOR RELEASE CANDIDATE**
 
 All mandatory local technical gates passed on 2026-11-04:
 
@@ -15,9 +15,23 @@ All mandatory local technical gates passed on 2026-11-04:
 | Automated Chrome walkthrough (desktop, mobile, backend-down) | PASS |
 | Security: no new issue introduced; no tracked secrets | PASS (legacy PR-ref exposure open, see below) |
 
-Not verified locally: the M5 Docker Compose stack (Docker not installed) and Node 22 (local Node 26; CI uses 22).
+Not verified locally: the M5 Docker Compose stack (Docker not installed). Node 22 was verified in CI (local runs used Node 26).
 
-**Release candidate commit:** recorded in the PR and in the follow-up status update once CI completes.
+**Release candidate commit:** `1bac27a60e1bdc51da18290598a2e5ea55aa8c1c` on `release/m6-final-submission` (message: `release(m6): verify EDEN Grid Sentinel submission candidate`). The CI results below were recorded in a docs-only follow-up commit.
+**Draft PR:** https://github.com/Edensystems/eden-grid-sentinel-meta-2026/pull/6 (not merged)
+
+### GitHub Actions on `1bac27a` — all success
+
+| Workflow (event) | Jobs | Run |
+|---|---|---|
+| CI (push) | test 3.11 ✔ (212 passed), test 3.12 ✔, sentinel-container ✔ | https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/41867774802 |
+| CI (pull_request) | test 3.11 ✔, test 3.12 ✔ (212 passed), sentinel-container ✔ | https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/41867837992 |
+| M5 Preview CI (push) | preview-backend 3.11/3.12 ✔, preview-frontend (Node 22) ✔ | https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/41867774849 |
+| M5 Preview CI (pull_request) | preview-backend 3.11/3.12 ✔, preview-frontend (Node 22) ✔ | https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/41867837714 |
+| M6 Submission Evidence CI (push) | offline-evidence 3.11/3.12 ✔ (9 passed; fingerprint `aa4bbb88…ab5b` on both) | https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/41867774978 |
+| M6 Submission Evidence CI (pull_request) | offline-evidence 3.11/3.12 ✔ | https://github.com/Edensystems/eden-grid-sentinel-meta-2026/actions/runs/41867837984 |
+
+CI reproduces the local evidence fingerprint exactly. Evidence artifacts are `eden-m6-evidence-py3.11` and `eden-m6-evidence-py3.12` (7-day retention) and `artifacts/m6/` in the repository. CI does not build the M5 Docker Compose stack, so it remains NOT VERIFIED.
 
 ## Competition status: **NOT APPROVED FOR COMPETITION SUBMISSION**
 
