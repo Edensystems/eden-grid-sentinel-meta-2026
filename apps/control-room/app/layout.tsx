@@ -4,6 +4,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'EDEN Grid Sentinel | Microgrid Control Room',
   description: 'Read-only, simulation-only school microgrid energy forecasting and scheduling dashboard.',
+  icons: { icon: '/favicon.svg' },
 };
 
 export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {

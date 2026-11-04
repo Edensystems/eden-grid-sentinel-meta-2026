@@ -36,5 +36,6 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+# "." lets tests import scripts/ (e.g. scripts.m6_evidence) under bare `pytest` too.
+pythonpath = ["src", "."]
 addopts = "-ra"
