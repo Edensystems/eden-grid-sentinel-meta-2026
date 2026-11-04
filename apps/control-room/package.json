@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:contracts": "tsc lib/contract.ts --target ES2022 --module nodenext --moduleResolution nodenext --skipLibCheck --outDir tests/contract-built && node --test tests/*.test.mjs"
+    "test:contracts": "tsc lib/contract.ts lib/incident.ts --target ES2022 --module nodenext --moduleResolution nodenext --skipLibCheck --outDir tests/contract-built && node --test tests/*.test.mjs"
   },
   "dependencies": {
     "next": "^16.0.0",

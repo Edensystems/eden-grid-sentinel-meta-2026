@@ -22,7 +22,7 @@ A Python/FastAPI microgrid simulator enforces battery state-of-charge, power and
 
 On the `critical_priority_school` fixture, baseline essential unmet demand is **1.7175 kWh** and scheduled essential unmet demand is **1.0000 kWh**, a **0.7175 kWh reduction**, while unmet flexible demand rises from **0** to **0.8770 kWh**. The simulation reports zero battery reserve violations. This is an illustrative trade-off, not field-validated energy savings. Additional scenarios and their exact outputs must be linked from the final M6 evidence artifact.
 
-One documented owner-approved live Muse Spark 1.3 request (2026-10-31) completed with two model requests and one allowlisted M1 tool call, returning a human-approval-required advisory. The end-to-end M3→M4 agent interaction is tested offline with a deterministic fake transport. The dashboard does not invoke a live model or expose approval controls.
+One documented owner-approved live Muse Spark 1.3 request (2026-10-31) completed with two model requests and one allowlisted M1 tool call, returning a human-approval-required advisory. On 2026-11-04 a second owner-approved live request ran the M3 path through the dashboard's operator-mode Incident panel (`critical_priority_school`): two model requests, one allowlisted M3 tool call, and a high-risk advisory attached to a Guardian-checked proposal that still required, and received, an explicit human decision. Evidence: `docs/hackathon/LIVE_INCIDENT_ADVISORY_2026-11-04.json`. Automated tests exercise the same chain offline with a deterministic fake transport. The dashboard does not invoke a live model or expose approval controls.
 
 ## Safety and limitations
 
